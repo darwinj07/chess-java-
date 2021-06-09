@@ -323,6 +323,7 @@ public class ChessBoard {
 					{ -1, -1 } };
 			int kinglist[][] = { { -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 },
 					{ -1, -1 } };
+			int block[][]={ { -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }};
 			for (int i = 0; i < 8; i++) {
 				for (int j = 0; j < 8; j++) {
 					if (chessBoardStatus[j][i].color.equals(turn)) {
@@ -350,11 +351,7 @@ public class ChessBoard {
 								}
 							}
 						}
-						for (int a = 0; a < 8; a++) {
-							for (int b = 0; b < 8; b++) {
-								unmarkPosition(a, b);
-							}
-						}
+						unpyoshi(i,j);
 
 					}
 				}
@@ -430,53 +427,43 @@ public class ChessBoard {
 						unmarkPosition(i, j);
 					}
 				}
-				//mark everywhere the pieces other than king can go
-				for (int i = 0; i < 8; i++) {
-					for (int j = 0; j < 8; j++) {
-						if (chessBoardStatus[j][i].color.equals(other)&&!chessBoardStatus[j][i].type.equals(PieceType.king)) {
-							pyoshi(i, j);
-						}
-					}
-				}
 				//save the area that needs to be blocked
 				switch (chessBoardStatus[checklist[0][1]][checklist[0][0]].type) {
 					case pawn:
-						if (chessBoardSquares[checklist[0][1]][checklist[0][0]].getBackground().equals(Color.pink))
-							break checkmate;
+						block[0]=checklist[0];//might neeed change;
 						break;
 					case bishop:
 						if (kingx + kingy == checklist[0][0] + checklist[0][1]) {
 							int a = kingx + kingy;
 							if (kingx > checklist[0][0]) {
 								for (int i = checklist[0][0]; i < kingx; i++) {
-									if (chessBoardSquares[a - i][i].getBackground().equals(Color.pink))
-										break checkmate;
+									block[i-checklist[0][0]][0]=i;
+									block[i-checklist[0][0]][1]=a-i;
 								}
 							} else {
 								for (int i = checklist[0][0]; i > kingx; i--) {
-									if (chessBoardSquares[a - i][i].getBackground().equals(Color.pink))
-										break checkmate;
+									block[-i+checklist[0][0]][0]=i;
+									block[-i+checklist[0][0]][1]=a-i;
 								}
 							}
 						} else {
 							int b = kingx - kingy;
 							if (kingx > checklist[0][0]) {
 								for (int i = checklist[0][0]; i < kingx; i++) {
-									if (chessBoardSquares[i - b][i].getBackground().equals(Color.pink))
-										break checkmate;
+									block[i-checklist[0][0]][0]=i;
+									block[i-checklist[0][0]][1]=i-b;
 								}
 							} else {
 								for (int i = checklist[0][0]; i > kingx; i--) {
-									if (chessBoardSquares[i - b][i].getBackground().equals(Color.pink))
-										break checkmate;
+									block[-i+checklist[0][0]][0]=i;
+									block[-i+checklist[0][0]][1]=i-b;
 								}
 							}
 						}
 						break;
+					//deleted king. if king checked the other king, that can never be checkmate.
 					case king:
-						if (chessBoardSquares[checklist[0][1]][checklist[0][0]].getBackground().equals(Color.pink))
-							break checkmate;
-						break;
+						break checkmate;
 					case knight:
 						if (chessBoardSquares[checklist[0][1]][checklist[0][0]].getBackground().equals(Color.pink))
 							break checkmate;
@@ -486,26 +473,26 @@ public class ChessBoard {
 							int a = kingx + kingy;
 							if (kingx > checklist[0][0]) {
 								for (int i = checklist[0][0]; i < kingx; i++) {
-									if (chessBoardSquares[a - i][i].getBackground().equals(Color.pink))
-										break checkmate;
+									block[i-checklist[0][0]][0]=i;
+									block[i-checklist[0][0]][1]=a-i;
 								}
 							} else {
 								for (int i = checklist[0][0]; i > kingx; i--) {
-									if (chessBoardSquares[a - i][i].getBackground().equals(Color.pink))
-										break checkmate;
+									block[-i+checklist[0][0]][0]=i;
+									block[-i+checklist[0][0]][1]=a-i;
 								}
 							}
 						} else if(kingx - kingy == checklist[0][0] - checklist[0][1]){
 							int b = kingx - kingy;
 							if (kingx > checklist[0][0]) {
 								for (int i = checklist[0][0]; i < kingx; i++) {
-									if (chessBoardSquares[i - b][i].getBackground().equals(Color.pink))
-										break checkmate;
+									block[i-checklist[0][0]][0]=i;
+									block[i-checklist[0][0]][1]=i-b;
 								}
 							} else {
 								for (int i = checklist[0][0]; i > kingx; i--) {
-									if (chessBoardSquares[i - b][i].getBackground().equals(Color.pink))
-										break checkmate;
+									block[-i+checklist[0][0]][0]=i;
+									block[-i+checklist[0][0]][1]=i-b;
 								}
 							}
 						}
@@ -513,13 +500,13 @@ public class ChessBoard {
 							if (kingy > checklist[0][1]) {
 								// kingy~checklist[0][1]+1
 								for (int i = checklist[0][1]; i < kingy; i++) {
-									if (chessBoardSquares[i][kingx].getBackground().equals(Color.pink))
-										break checkmate;
+									block[i-checklist[0][1]][0]=kingx;
+									block[i-checklist[0][1]][1]=i;
 								}
 							} else {
 								for (int i = checklist[0][1]; i > kingy; i--) {
-									if (chessBoardSquares[i][kingx].getBackground().equals(Color.pink))
-										break checkmate;
+									block[-i+checklist[0][1]][0]=kingx;
+									block[-i+checklist[0][1]][1]=i;
 								}
 							}
 
@@ -527,13 +514,13 @@ public class ChessBoard {
 							if (kingx > checklist[0][0]) {
 								// kingy~checklist[0][1]+1
 								for (int i = checklist[0][0]; i < kingx; i++) {
-									if (chessBoardSquares[kingy][i].getBackground().equals(Color.pink))
-										break checkmate;
+									block[i-checklist[0][0]][0]=i;
+									block[i-checklist[0][0]][1]=kingy;
 								}
 							} else {
 								for (int i = checklist[0][0]; i > kingx; i--) {
-									if (chessBoardSquares[kingy][i].getBackground().equals(Color.pink))
-										break checkmate;
+									block[-i+checklist[0][0]][0]=i;
+									block[-i+checklist[0][0]][1]=kingy;
 								}
 							}
 						}
@@ -543,13 +530,13 @@ public class ChessBoard {
 							if (kingy > checklist[0][1]) {
 								// kingy~checklist[0][1]+1
 								for (int i = checklist[0][1]; i < kingy; i++) {
-									if (chessBoardSquares[i][kingx].getBackground().equals(Color.pink))
-										break checkmate;
+									block[i-checklist[0][1]][0]=kingx;
+									block[i-checklist[0][1]][1]=i;
 								}
 							} else {
 								for (int i = checklist[0][1]; i > kingy; i--) {
-									if (chessBoardSquares[i][kingx].getBackground().equals(Color.pink))
-										break checkmate;
+									block[-i+checklist[0][1]][0]=kingx;
+									block[-i+checklist[0][1]][1]=i;
 								}
 							}
 
@@ -557,20 +544,64 @@ public class ChessBoard {
 							if (kingx > checklist[0][0]) {
 								// kingy~checklist[0][1]+1
 								for (int i = checklist[0][0]; i < kingx; i++) {
-									if (chessBoardSquares[kingy][i].getBackground().equals(Color.pink))
-										break checkmate;
+									block[i-checklist[0][0]][0]=i;
+									block[i-checklist[0][0]][1]=kingy;
 								}
 							} else {
 								for (int i = checklist[0][0]; i > kingx; i--) {
-									if (chessBoardSquares[kingy][i].getBackground().equals(Color.pink))
-										break checkmate;
+									block[-i+checklist[0][0]][0]=i;
+									block[-i+checklist[0][0]][1]=kingy;
 								}
 							}
 
 						}
 						break;
 				}
+				//pyoshi each white piece, see if block list it pink. if true then remove that white piece(color=none) and check if it is check.
+				PlayerColor tempcolor;
+				PieceType temptype;
+				for(int i=0;i<8;i++){
+					for (int j=0;j<8;j++){
+						if(chessBoardStatus[j][i].color.equals(other)&&!chessBoardStatus[j][i].type.equals(PieceType.king)){
+							pyoshi(i,j);
+							for(int k=0;k<7;k++){
+								if(block[k][0]<0) break;
+								if(chessBoardSquares[block[k][1]][block[k][0]].getBackground().equals(Color.pink)){
+									unpyoshi(i,j);
+									chessBoardStatus[j][i].color=PlayerColor.none;
+					
+									tempcolor=chessBoardStatus[block[k][1]][block[k][0]].color;
+									chessBoardStatus[block[k][1]][block[k][0]].color=other;
+									temptype=chessBoardStatus[block[k][1]][block[k][0]].type;
+									chessBoardStatus[block[k][1]][block[k][0]].type=chessBoardStatus[j][i].type;
+									chessBoardStatus[j][i].type=PieceType.none;
+									for(int a=0;a<8;a++){
+										for(int b=0;b<8;b++){
+											if(chessBoardStatus[b][a].color.equals(turn)) pyoshi(a,b);
+										}
+									}
+									chessBoardStatus[j][i].color=other;
+									chessBoardStatus[block[k][1]][block[k][0]].color=tempcolor;
+									chessBoardStatus[j][i].type=chessBoardStatus[block[k][1]][block[k][0]].type;
+									chessBoardStatus[block[k][1]][block[k][0]].type=temptype;
+									if(!chessBoardSquares[kingy][kingx].getBackground().equals(Color.pink)) {
+
+										break checkmate;
+									}
+									for(int a=0;a<8;a++){
+										for(int b=0;b<8;b++){
+											unmarkPosition(a, b);
+										}
+									}
 				
+
+								}
+							}
+							unpyoshi(i,j);
+						}
+						}
+				}
+
 				end = true;
 				setStatus("CHECKMATE");
 				break;
@@ -589,7 +620,7 @@ public class ChessBoard {
 				case king:
 					for (int i = x - 1; i <= x + 1; i++) {
 						for (int j = y - 1; j <= y + 1; j++) {
-							if (0 <= i && i < 8 && 0 <= j && j < 8 && !chessBoardStatus[j][i].color.equals(turn)) {
+							if (0 <= i && i < 8 && 0 <= j && j < 8 && !chessBoardStatus[j][i].color.equals(chessBoardStatus[y][x].color)) {
 								markPosition(i, j);
 							}
 						}
@@ -604,7 +635,7 @@ public class ChessBoard {
 							if (chessBoardStatus[a - i][i].type.equals(PieceType.none)) {
 								markPosition(i, a - i);
 							} else {
-								if (!chessBoardStatus[a - i][i].color.equals(turn))
+								if (!chessBoardStatus[a - i][i].color.equals(chessBoardStatus[y][x].color))
 									markPosition(i, a - i);
 								break;
 							}
@@ -613,7 +644,7 @@ public class ChessBoard {
 							if (chessBoardStatus[a - i][i].type.equals(PieceType.none)) {
 								markPosition(i, a - i);
 							} else {
-								if (!chessBoardStatus[a - i][i].color.equals(turn))
+								if (!chessBoardStatus[a - i][i].color.equals(chessBoardStatus[y][x].color))
 									markPosition(i, a - i);
 								break;
 							}
@@ -623,7 +654,7 @@ public class ChessBoard {
 							if (chessBoardStatus[a - i][i].type.equals(PieceType.none)) {
 								markPosition(i, a - i);
 							} else {
-								if (!chessBoardStatus[a - i][i].color.equals(turn))
+								if (!chessBoardStatus[a - i][i].color.equals(chessBoardStatus[y][x].color))
 									markPosition(i, a - i);
 								break;
 							}
@@ -632,7 +663,7 @@ public class ChessBoard {
 							if (chessBoardStatus[a - i][i].type.equals(PieceType.none)) {
 								markPosition(i, a - i);
 							} else {
-								if (!chessBoardStatus[a - i][i].color.equals(turn))
+								if (!chessBoardStatus[a - i][i].color.equals(chessBoardStatus[y][x].color))
 									markPosition(i, a - i);
 								break;
 							}
@@ -643,7 +674,7 @@ public class ChessBoard {
 							if (chessBoardStatus[i - b][i].type.equals(PieceType.none)) {
 								markPosition(i, i - b);
 							} else {
-								if (!chessBoardStatus[i - b][i].color.equals(turn))
+								if (!chessBoardStatus[i - b][i].color.equals(chessBoardStatus[y][x].color))
 									markPosition(i, i - b);
 								break;
 							}
@@ -652,7 +683,7 @@ public class ChessBoard {
 							if (chessBoardStatus[i - b][i].type.equals(PieceType.none)) {
 								markPosition(i, i - b);
 							} else {
-								if (!chessBoardStatus[i - b][i].color.equals(turn))
+								if (!chessBoardStatus[i - b][i].color.equals(chessBoardStatus[y][x].color))
 									markPosition(i, i - b);
 								break;
 							}
@@ -662,7 +693,7 @@ public class ChessBoard {
 							if (chessBoardStatus[i - b][i].type.equals(PieceType.none)) {
 								markPosition(i, i - b);
 							} else {
-								if (!chessBoardStatus[i - b][i].color.equals(turn))
+								if (!chessBoardStatus[i - b][i].color.equals(chessBoardStatus[y][x].color))
 									markPosition(i, i - b);
 								break;
 							}
@@ -671,7 +702,7 @@ public class ChessBoard {
 							if (chessBoardStatus[i - b][i].type.equals(PieceType.none)) {
 								markPosition(i, i - b);
 							} else {
-								if (!chessBoardStatus[i - b][i].color.equals(turn))
+								if (!chessBoardStatus[i - b][i].color.equals(chessBoardStatus[y][x].color))
 									markPosition(i, i - b);
 								break;
 							}
@@ -683,7 +714,7 @@ public class ChessBoard {
 							{ -1, -2 } };
 					for (int i = 0; i < 8; i++) {
 						if (0 <= x + k[i][0] && x + k[i][0] < 8 && y + k[i][1] >= 0 && y + k[i][1] < 8) {
-							if (!chessBoardStatus[y + k[i][1]][x + k[i][0]].color.equals(turn))
+							if (!chessBoardStatus[y + k[i][1]][x + k[i][0]].color.equals(chessBoardStatus[y][x].color))
 								markPosition(x + k[i][0], y + k[i][1]);
 						}
 					}
@@ -740,7 +771,7 @@ public class ChessBoard {
 						if (chessBoardStatus[y][i].type.equals(PieceType.none)) {
 							markPosition(i, y);
 						} else {
-							if (!chessBoardStatus[y][i].color.equals(turn))
+							if (!chessBoardStatus[y][i].color.equals(chessBoardStatus[y][x].color))
 								markPosition(i, y);
 							break;
 						}
@@ -749,7 +780,7 @@ public class ChessBoard {
 						if (chessBoardStatus[y][i].type.equals(PieceType.none)) {
 							markPosition(i, y);
 						} else {
-							if (!chessBoardStatus[y][i].color.equals(turn))
+							if (!chessBoardStatus[y][i].color.equals(chessBoardStatus[y][x].color))
 								markPosition(i, y);
 							break;
 						}
@@ -758,7 +789,7 @@ public class ChessBoard {
 						if (chessBoardStatus[j][x].type.equals(PieceType.none)) {
 							markPosition(x, j);
 						} else {
-							if (!chessBoardStatus[j][x].color.equals(turn))
+							if (!chessBoardStatus[j][x].color.equals(chessBoardStatus[y][x].color))
 								markPosition(x, j);
 							break;
 						}
@@ -767,7 +798,7 @@ public class ChessBoard {
 						if (chessBoardStatus[j][x].type.equals(PieceType.none)) {
 							markPosition(x, j);
 						} else {
-							if (!chessBoardStatus[j][x].color.equals(turn))
+							if (!chessBoardStatus[j][x].color.equals(chessBoardStatus[y][x].color))
 								markPosition(x, j);
 							break;
 						}
@@ -779,7 +810,7 @@ public class ChessBoard {
 							if (chessBoardStatus[a - i][i].type.equals(PieceType.none)) {
 								markPosition(i, a - i);
 							} else {
-								if (!chessBoardStatus[a - i][i].color.equals(turn))
+								if (!chessBoardStatus[a - i][i].color.equals(chessBoardStatus[y][x].color))
 									markPosition(i, a - i);
 								break;
 							}
@@ -788,7 +819,7 @@ public class ChessBoard {
 							if (chessBoardStatus[a - i][i].type.equals(PieceType.none)) {
 								markPosition(i, a - i);
 							} else {
-								if (!chessBoardStatus[a - i][i].color.equals(turn))
+								if (!chessBoardStatus[a - i][i].color.equals(chessBoardStatus[y][x].color))
 									markPosition(i, a - i);
 								break;
 							}
@@ -798,7 +829,7 @@ public class ChessBoard {
 							if (chessBoardStatus[a - i][i].type.equals(PieceType.none)) {
 								markPosition(i, a - i);
 							} else {
-								if (!chessBoardStatus[a - i][i].color.equals(turn))
+								if (!chessBoardStatus[a - i][i].color.equals(chessBoardStatus[y][x].color))
 									markPosition(i, a - i);
 								break;
 							}
@@ -807,7 +838,7 @@ public class ChessBoard {
 							if (chessBoardStatus[a - i][i].type.equals(PieceType.none)) {
 								markPosition(i, a - i);
 							} else {
-								if (!chessBoardStatus[a - i][i].color.equals(turn))
+								if (!chessBoardStatus[a - i][i].color.equals(chessBoardStatus[y][x].color))
 									markPosition(i, a - i);
 								break;
 							}
@@ -818,7 +849,7 @@ public class ChessBoard {
 							if (chessBoardStatus[i - b][i].type.equals(PieceType.none)) {
 								markPosition(i, i - b);
 							} else {
-								if (!chessBoardStatus[i - b][i].color.equals(turn))
+								if (!chessBoardStatus[i - b][i].color.equals(chessBoardStatus[y][x].color))
 									markPosition(i, i - b);
 								break;
 							}
@@ -827,7 +858,7 @@ public class ChessBoard {
 							if (chessBoardStatus[i - b][i].type.equals(PieceType.none)) {
 								markPosition(i, i - b);
 							} else {
-								if (!chessBoardStatus[i - b][i].color.equals(turn))
+								if (!chessBoardStatus[i - b][i].color.equals(chessBoardStatus[y][x].color))
 									markPosition(i, i - b);
 								break;
 							}
@@ -837,7 +868,7 @@ public class ChessBoard {
 							if (chessBoardStatus[i - b][i].type.equals(PieceType.none)) {
 								markPosition(i, i - b);
 							} else {
-								if (!chessBoardStatus[i - b][i].color.equals(turn))
+								if (!chessBoardStatus[i - b][i].color.equals(chessBoardStatus[y][x].color))
 									markPosition(i, i - b);
 								break;
 							}
@@ -846,7 +877,7 @@ public class ChessBoard {
 							if (chessBoardStatus[i - b][i].type.equals(PieceType.none)) {
 								markPosition(i, i - b);
 							} else {
-								if (!chessBoardStatus[i - b][i].color.equals(turn))
+								if (!chessBoardStatus[i - b][i].color.equals(chessBoardStatus[y][x].color))
 									markPosition(i, i - b);
 								break;
 							}
@@ -858,7 +889,7 @@ public class ChessBoard {
 						if (chessBoardStatus[y][i].type.equals(PieceType.none)) {
 							markPosition(i, y);
 						} else {
-							if (!chessBoardStatus[y][i].color.equals(turn))
+							if (!chessBoardStatus[y][i].color.equals(chessBoardStatus[y][x].color))
 								markPosition(i, y);
 							break;
 						}
@@ -867,7 +898,7 @@ public class ChessBoard {
 						if (chessBoardStatus[y][i].type.equals(PieceType.none)) {
 							markPosition(i, y);
 						} else {
-							if (!chessBoardStatus[y][i].color.equals(turn))
+							if (!chessBoardStatus[y][i].color.equals(chessBoardStatus[y][x].color))
 								markPosition(i, y);
 							break;
 						}
@@ -876,7 +907,7 @@ public class ChessBoard {
 						if (chessBoardStatus[j][x].type.equals(PieceType.none)) {
 							markPosition(x, j);
 						} else {
-							if (!chessBoardStatus[j][x].color.equals(turn))
+							if (!chessBoardStatus[j][x].color.equals(chessBoardStatus[y][x].color))
 								markPosition(x, j);
 							break;
 						}
@@ -885,7 +916,7 @@ public class ChessBoard {
 						if (chessBoardStatus[j][x].type.equals(PieceType.none)) {
 							markPosition(x, j);
 						} else {
-							if (!chessBoardStatus[j][x].color.equals(turn))
+							if (!chessBoardStatus[j][x].color.equals(chessBoardStatus[y][x].color))
 								markPosition(x, j);
 							break;
 						}
@@ -894,12 +925,321 @@ public class ChessBoard {
 			}
 
 		}
+		private void unpyoshi(int x, int y) {
+			int a, b;
+			switch (chessBoardStatus[y][x].type) {
+				case king:
+					for (int i = x - 1; i <= x + 1; i++) {
+						for (int j = y - 1; j <= y + 1; j++) {
+							if (0 <= i && i < 8 && 0 <= j && j < 8 && !chessBoardStatus[j][i].color.equals(chessBoardStatus[y][x].color)) {
+								unmarkPosition(i, j);
+							}
+						}
+					}
+					break;
+				case bishop:
+					a = x + y;
+					b = x - y;
+					if (a <= 7) {
+						for (int i = x + 1; i <= a; i++) {
+							if (chessBoardStatus[a - i][i].type.equals(PieceType.none)) {
+								unmarkPosition(i, a - i);
+							} else {
+								if (!chessBoardStatus[a - i][i].color.equals(chessBoardStatus[y][x].color))
+									unmarkPosition(i, a - i);
+								break;
+							}
+						}
+						for (int i = x - 1; i >= 0; i--) {
+							if (chessBoardStatus[a - i][i].type.equals(PieceType.none)) {
+								unmarkPosition(i, a - i);
+							} else {
+								if (!chessBoardStatus[a - i][i].color.equals(chessBoardStatus[y][x].color))
+								unmarkPosition(i, a - i);
+								break;
+							}
+						}
+					} else {
+						for (int i = x + 1; i <= 7; i++) {
+							if (chessBoardStatus[a - i][i].type.equals(PieceType.none)) {
+								unmarkPosition(i, a - i);
+							} else {
+								if (!chessBoardStatus[a - i][i].color.equals(chessBoardStatus[y][x].color))
+								unmarkPosition(i, a - i);
+								break;
+							}
+						}
+						for (int i = x - 1; i >= a - 7; i--) {
+							if (chessBoardStatus[a - i][i].type.equals(PieceType.none)) {
+								unmarkPosition(i, a - i);
+							} else {
+								if (!chessBoardStatus[a - i][i].color.equals(chessBoardStatus[y][x].color))
+								unmarkPosition(i, a - i);
+								break;
+							}
+						}
+					}
+					if (b >= 0) {
+						for (int i = x + 1; i <= 7; i++) {
+							if (chessBoardStatus[i - b][i].type.equals(PieceType.none)) {
+								unmarkPosition(i, i - b);
+							} else {
+								if (!chessBoardStatus[i - b][i].color.equals(chessBoardStatus[y][x].color))
+								unmarkPosition(i, i - b);
+								break;
+							}
+						}
+						for (int i = x - 1; i >= b; i--) {
+							if (chessBoardStatus[i - b][i].type.equals(PieceType.none)) {
+								unmarkPosition(i, i - b);
+							} else {
+								if (!chessBoardStatus[i - b][i].color.equals(chessBoardStatus[y][x].color))
+								unmarkPosition(i, i - b);
+								break;
+							}
+						}
+					} else {
+						for (int i = x + 1; i <= 7 + b; i++) {
+							if (chessBoardStatus[i - b][i].type.equals(PieceType.none)) {
+								unmarkPosition(i, i - b);
+							} else {
+								if (!chessBoardStatus[i - b][i].color.equals(chessBoardStatus[y][x].color))
+								unmarkPosition(i, i - b);
+								break;
+							}
+						}
+						for (int i = x - 1; i >= 0; i--) {
+							if (chessBoardStatus[i - b][i].type.equals(PieceType.none)) {
+								unmarkPosition(i, i - b);
+							} else {
+								if (!chessBoardStatus[i - b][i].color.equals(chessBoardStatus[y][x].color))
+								unmarkPosition(i, i - b);
+								break;
+							}
+						}
+					}
+					break;
+				case knight:
+					int k[][] = { { 2, 1 }, { 2, -1 }, { -2, 1 }, { -2, -1 }, { 1, 2 }, { 1, -2 }, { -1, 2 },
+							{ -1, -2 } };
+					for (int i = 0; i < 8; i++) {
+						if (0 <= x + k[i][0] && x + k[i][0] < 8 && y + k[i][1] >= 0 && y + k[i][1] < 8) {
+							if (!chessBoardStatus[y + k[i][1]][x + k[i][0]].color.equals(chessBoardStatus[y][x].color))
+							unmarkPosition(x + k[i][0], y + k[i][1]);
+						}
+					}
+					break;
+				case pawn:
+					if (chessBoardStatus[y][x].color.equals(PlayerColor.white)) {
+						if (0 <= x - 1 && 0 <= y - 1) {
+							if (chessBoardStatus[y - 1][x - 1].color.equals(PlayerColor.black))
+							unmarkPosition(x - 1, y - 1);
+						}
+						if (8 > y + 1 && 0 <= x - 1) {
+							if (chessBoardStatus[y + 1][x - 1].color.equals(PlayerColor.black))
+							unmarkPosition(x - 1, y + 1);
+						}
+						if (x == 6) {
+							for (int i = 5; i >= 4; i--) {
+								if (chessBoardStatus[y][i].type.equals(PieceType.none))
+								unmarkPosition(i, y);
+								else
+									break;
+							}
+						} else {
+							if (x - 1 >= 0) {
+								if (chessBoardStatus[y][x - 1].type.equals(PieceType.none))
+								unmarkPosition(x - 1, y);
+							}
+						}
+					} else {
+						if (8 > x + 1 && 8 > y + 1) {
+							if (chessBoardStatus[y + 1][x + 1].color.equals(PlayerColor.white))
+							unmarkPosition(x + 1, y + 1);
+						}
+						if (8 > x + 1 && 0 <= y - 1) {
+							if (chessBoardStatus[y - 1][x + 1].color.equals(PlayerColor.white))
+							unmarkPosition(x + 1, y - 1);
+						}
+						if (x == 1) {
+							for (int i = 2; i <= 3; i++) {
+								if (chessBoardStatus[y][i].type.equals(PieceType.none))
+								unmarkPosition(i, y);
+								else
+									break;
+							}
+						} else {
+							if (x + 1 < 8) {
+								if (chessBoardStatus[y][x + 1].type.equals(PieceType.none))
+								unmarkPosition(x + 1, y);
+							}
+						}
+					}
+					break;
+				case queen:
+					for (int i = x + 1; i < 8; i++) {
+						if (chessBoardStatus[y][i].type.equals(PieceType.none)) {
+							unmarkPosition(i, y);
+						} else {
+							if (!chessBoardStatus[y][i].color.equals(chessBoardStatus[y][x].color))
+							unmarkPosition(i, y);
+							break;
+						}
+					}
+					for (int i = x - 1; i >= 0; i--) {
+						if (chessBoardStatus[y][i].type.equals(PieceType.none)) {
+							unmarkPosition(i, y);
+						} else {
+							if (!chessBoardStatus[y][i].color.equals(chessBoardStatus[y][x].color))
+							unmarkPosition(i, y);
+							break;
+						}
+					}
+					for (int j = y + 1; j < 8; j++) {
+						if (chessBoardStatus[j][x].type.equals(PieceType.none)) {
+							unmarkPosition(x, j);
+						} else {
+							if (!chessBoardStatus[j][x].color.equals(chessBoardStatus[y][x].color))
+							unmarkPosition(x, j);
+							break;
+						}
+					}
+					for (int j = y - 1; j >= 0; j--) {
+						if (chessBoardStatus[j][x].type.equals(PieceType.none)) {
+							unmarkPosition(x, j);
+						} else {
+							if (!chessBoardStatus[j][x].color.equals(chessBoardStatus[y][x].color))
+							unmarkPosition(x, j);
+							break;
+						}
+					}
+					a = x + y;
+					b = x - y;
+					if (a <= 7) {
+						for (int i = x + 1; i <= a; i++) {
+							if (chessBoardStatus[a - i][i].type.equals(PieceType.none)) {
+								unmarkPosition(i, a - i);
+							} else {
+								if (!chessBoardStatus[a - i][i].color.equals(chessBoardStatus[y][x].color))
+								unmarkPosition(i, a - i);
+								break;
+							}
+						}
+						for (int i = x - 1; i >= 0; i--) {
+							if (chessBoardStatus[a - i][i].type.equals(PieceType.none)) {
+								unmarkPosition(i, a - i);
+							} else {
+								if (!chessBoardStatus[a - i][i].color.equals(chessBoardStatus[y][x].color))
+								unmarkPosition(i, a - i);
+								break;
+							}
+						}
+					} else {
+						for (int i = x + 1; i <= 7; i++) {
+							if (chessBoardStatus[a - i][i].type.equals(PieceType.none)) {
+								unmarkPosition(i, a - i);
+							} else {
+								if (!chessBoardStatus[a - i][i].color.equals(chessBoardStatus[y][x].color))
+								unmarkPosition(i, a - i);
+								break;
+							}
+						}
+						for (int i = x - 1; i >= a - 7; i--) {
+							if (chessBoardStatus[a - i][i].type.equals(PieceType.none)) {
+								unmarkPosition(i, a - i);
+							} else {
+								if (!chessBoardStatus[a - i][i].color.equals(chessBoardStatus[y][x].color))
+								unmarkPosition(i, a - i);
+								break;
+							}
+						}
+					}
+					if (b >= 0) {
+						for (int i = x + 1; i <= 7; i++) {
+							if (chessBoardStatus[i - b][i].type.equals(PieceType.none)) {
+								unmarkPosition(i, i - b);
+							} else {
+								if (!chessBoardStatus[i - b][i].color.equals(chessBoardStatus[y][x].color))
+								unmarkPosition(i, i - b);
+								break;
+							}
+						}
+						for (int i = x - 1; i >= b; i--) {
+							if (chessBoardStatus[i - b][i].type.equals(PieceType.none)) {
+								unmarkPosition(i, i - b);
+							} else {
+								if (!chessBoardStatus[i - b][i].color.equals(chessBoardStatus[y][x].color))
+								unmarkPosition(i, i - b);
+								break;
+							}
+						}
+					} else {
+						for (int i = x + 1; i <= 7 + b; i++) {
+							if (chessBoardStatus[i - b][i].type.equals(PieceType.none)) {
+								unmarkPosition(i, i - b);
+							} else {
+								if (!chessBoardStatus[i - b][i].color.equals(chessBoardStatus[y][x].color))
+								unmarkPosition(i, i - b);
+								break;
+							}
+						}
+						for (int i = x - 1; i >= 0; i--) {
+							if (chessBoardStatus[i - b][i].type.equals(PieceType.none)) {
+								unmarkPosition(i, i - b);
+							} else {
+								if (!chessBoardStatus[i - b][i].color.equals(chessBoardStatus[y][x].color))
+								unmarkPosition(i, i - b);
+								break;
+							}
+						}
+					}
+					break;
+				case rook:
+					for (int i = x + 1; i < 8; i++) {
+						if (chessBoardStatus[y][i].type.equals(PieceType.none)) {
+							unmarkPosition(i, y);
+						} else {
+							if (!chessBoardStatus[y][i].color.equals(chessBoardStatus[y][x].color))
+							unmarkPosition(i, y);
+							break;
+						}
+					}
+					for (int i = x - 1; i >= 0; i--) {
+						if (chessBoardStatus[y][i].type.equals(PieceType.none)) {
+							unmarkPosition(i, y);
+						} else {
+							if (!chessBoardStatus[y][i].color.equals(chessBoardStatus[y][x].color))
+							unmarkPosition(i, y);
+							break;
+						}
+					}
+					for (int j = y + 1; j < 8; j++) {
+						if (chessBoardStatus[j][x].type.equals(PieceType.none)) {
+							unmarkPosition(x, j);
+						} else {
+							if (!chessBoardStatus[j][x].color.equals(chessBoardStatus[y][x].color))
+							unmarkPosition(x, j);
+							break;
+						}
+					}
+					for (int j = y - 1; j >= 0; j--) {
+						if (chessBoardStatus[j][x].type.equals(PieceType.none)) {
+							unmarkPosition(x, j);
+						} else {
+							if (!chessBoardStatus[j][x].color.equals(chessBoardStatus[y][x].color))
+							unmarkPosition(x, j);
+							break;
+						}
+					}
+					break;
+			}
 
+		}
 	}
 
 	void onInitiateBoard() {
-		turn = PlayerColor.white;
-		other = PlayerColor.black;
+		turn = PlayerColor.black;
+		other = PlayerColor.white;
 		end = false;
 		setStatus("BLACK's TURN");
 
