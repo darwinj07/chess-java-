@@ -356,6 +356,33 @@ public class ChessBoard {
 					}
 				}
 			}
+			//if both are check, then it can't be checkmate. return.
+			for(int i=0;i<8;i++){
+				for(int j=0;j<8;j++){
+					if(chessBoardStatus[j][i].color.equals(other)) pyoshi(i,j);
+				}
+			}
+			outer:
+			for(int i=0;i<8;i++){
+				for(int j=0;j<8;j++){
+					if(chessBoardStatus[j][i].type.equals(PieceType.king)&&chessBoardStatus[j][i].color.equals(turn)){
+						if(chessBoardSquares[j][i].getBackground().equals(Color.pink)){
+							for(int a=0;a<8;a++){
+								for(int b=0;b<8;b++){
+									unmarkPosition(a,b);
+								}
+							}
+							return;
+						}
+						break outer;
+					} 
+				}
+			}
+			for(int a=0;a<8;a++){
+				for(int b=0;b<8;b++){
+					unmarkPosition(a,b);
+				}
+			}
 			// checkmate
 			checkmate: while (checklist[0][0] >= 0) {// when check
 				// find king, change around king to white
@@ -465,8 +492,7 @@ public class ChessBoard {
 					case king:
 						break checkmate;
 					case knight:
-						if (chessBoardSquares[checklist[0][1]][checklist[0][0]].getBackground().equals(Color.pink))
-							break checkmate;
+						block[0]=checklist[0];
 						break;
 					case queen:
 						if (kingx + kingy == checklist[0][0] + checklist[0][1]) {
